@@ -16,4 +16,12 @@ public class Edge {
     public String toString() {
         return v1 + " -- " + v2;
     }
+
+    public int getV1() {
+        return v1;
+    }
+
+    public int getV2() {
+        return v2;
+    }
 }

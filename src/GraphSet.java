@@ -1,12 +1,13 @@
 public class GraphSet {
-    private Graph[] all_the_graphs;
     private Graph K;
     private int current = 0;
+    private int num_edges, num_graphs, v;
+
    
     public GraphSet(int vertices) {
-        int num_edges = (vertices*(vertices-1))/2;
-        int num_graphs = (int) Math.pow(2,num_edges);
-        all_the_graphs = new Graph[num_graphs];
+        v = vertices;
+        num_edges = (vertices*(vertices-1))/2;
+        num_graphs = (int) Math.pow(2,num_edges);
         K = new Graph(vertices);
 
         int index = 0;
@@ -18,53 +19,55 @@ public class GraphSet {
             }
         }
 
-        for (int i = 0; i < num_graphs; i++) {
-            all_the_graphs[i] = new Graph(vertices);
-            String key = Integer.toBinaryString(i);
-            while (key.length() < num_edges) {
-                key = "0" + key;
-            }
-            boolean[] key_bool = new boolean[num_edges];
-            for (int j = 0; j < num_edges; j++) {
-                if (key.charAt(num_edges-1-j) == '1') {
-                    key_bool[j] = true;
-                } else {
-                    key_bool[j] = false;
-                }
-            }
-            index = 0;
-            for (Edge e : K.getEdges()) {
-                if (key_bool[index]) {
-                    all_the_graphs[i].addEdge(e);
-                }
-                index++;
-            }
-        }
     }
 
     public Graph getCurrent() {
-        return all_the_graphs[current];
+        return this.getGraph(current);
     } 
 
     public Graph getNext() {
         current++;
-        if (current >= all_the_graphs.length) {current = 0;}
-        return all_the_graphs[current];
+        if (current >= num_graphs) {current = 0;}
+        return this.getGraph(current);
     }
 
     public Graph getComplete() {
         return K;
     }
 
-    public Graph getGraph(int index) {
-        return all_the_graphs[index];
-    }
-
-    public Graph[] getAll() {
-        return all_the_graphs;
+    public Graph getGraph(int i) {
+        Graph G = new Graph(v);
+        String key = Integer.toBinaryString(i);
+        while (key.length() < num_edges) {
+            key = "0" + key;
+        }
+        boolean[] key_bool = new boolean[num_edges];
+        for (int j = 0; j < num_edges; j++) {
+            if (key.charAt(num_edges-1-j) == '1') {
+                key_bool[j] = true;
+            } else {
+                key_bool[j] = false;
+            }
+        }
+        int index = 0;
+        for (Edge e : K.getEdges()) {
+            if (key_bool[index]) {
+                G.addEdge(e);
+            }
+            index++;
+        }
+        return G;
     }
 
     public int size() {
-        return all_the_graphs.length;
+        return num_graphs; 
+    }
+
+    public Graph getNextTree() {
+        if (this.getNext().isTree()) {
+            return this.getCurrent();
+        } else {
+            return this.getNextTree();
+        }
     }
 }

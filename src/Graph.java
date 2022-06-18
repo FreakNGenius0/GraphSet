@@ -20,6 +20,10 @@ public class Graph {
        return edgeList;
    }
 
+   public int numEdges() {
+       return edges;
+   }
+
    public String toString() {
        String ans = "";
        for (Edge e : edgeList) {
@@ -44,26 +48,27 @@ public class Graph {
        return adjacency;
    }
 
+   private boolean hasCycle(int v, boolean[] visited, int parent, LinkedList<Integer>[] adj) {
+        visited[v] = true;
+        for (int vertex : adj[v]) {
+            if (!visited[vertex]) {
+                if (hasCycle(vertex, visited, v, adj)) {
+                    return true;
+                }
+            } else if (vertex != parent) {
+                return true;
+            }
+        }
+        return false;
+   }
+
    public boolean isTree() {
        boolean[] visited = new boolean[v];
        Arrays.fill(visited, false);
-       Integer parent = null;
-       Stack<Integer> stack = new Stack<Integer>();
        LinkedList<Integer>[] adjacency = this.toAdjacencyList();
 
-       stack.add(0);
-       visited[0] = true;
-       while (!stack.empty()) {
-           int current = stack.pop();
-           for (int vertex : adjacency[current]) {
-               if (visited[vertex] == true && vertex != current && vertex != parent) {
-                   return false;
-               } else if (adjacency[vertex].size() != 1 && vertex != current){
-                   stack.add(vertex);
-               }
-               visited[vertex] = true;
-               parent = vertex;
-           }
+       if (hasCycle(0, visited, -1, adjacency)) {
+           return false;
        }
 
        for (boolean vertex : visited) {
